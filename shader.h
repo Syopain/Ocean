@@ -16,6 +16,7 @@ public:
     void setUniform(std::string const& name, int value);
     void setUniform(std::string const& name, float value);
     void setUniform(std::string const& name, glm::mat4 const& vlaue);
+    void setUniform(std::string const& name, glm::vec3 const& value);
 protected:
 private:
     unsigned int id_;
@@ -46,9 +47,14 @@ inline void Shader::setUniform(std::string const& name, float value)
     glUniform1f(glGetUniformLocation(id_, name.c_str()), value);
 }
 
-inline void Shader::setUniform(const std::string& name, const glm::mat4& value)
+inline void Shader::setUniform(std::string const& name, glm::mat4 const& value)
 {
     glUniformMatrix4fv(glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+inline void Shader::setUniform(std::string const& name, glm::vec3 const& value)
+{
+    glUniform3fv(glGetUniformLocation(id_, name.c_str()), 1, glm::value_ptr(value));
 }
 
 #endif // SHADER_H

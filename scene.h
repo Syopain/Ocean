@@ -7,6 +7,7 @@
 #include <bitset>
 #include "shader.h"
 #include "camera.h"
+#include "mesh.h"
 
 class Scene : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -33,6 +34,8 @@ private:
     QElapsedTimer timer;
     float delta_time = 0.0;
     float last_frame = 0.0;
+    Mesh mesh;
     std::bitset<64> key;
+    unsigned int VAO;
 };
 #endif // SCENE_H

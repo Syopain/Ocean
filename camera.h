@@ -20,6 +20,7 @@ public:
     void speedUp(int value);
     void rotate(float pitch, float yaw);
     float zoom(int angle);
+    glm::vec3 const& position() const;
     glm::mat4 lookAt();
 private:
     glm::vec3 pos_;
@@ -83,9 +84,13 @@ inline glm::mat4 Camera::lookAt()
 
 inline float Camera::zoom(int angle)
 {
-    fav_ -= angle * 0.1f;  //sensitivity
+    fav_ -= angle * 0.05f;  //sensitivity
     fav_ = std::max(std::min(fav_, 45.0f), 5.0f);
     return glm::radians(fav_);
 }
 
+inline glm::vec3 const& Camera::position() const
+{
+    return pos_;
+}
 #endif // CAMERA_H

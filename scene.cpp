@@ -1,4 +1,3 @@
-#include "scene.h"
 #include <QDebug>
 #include <QString>
 #include <QTimer>
@@ -8,11 +7,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <QVector>
+#include "scene.h"
 
 Scene::Scene(QWidget *parent) :
     QOpenGLWidget(parent),
     shader("../shader.vert", "../shader.frag"),
-    camera(glm::vec3(0.0f, 0.0f, 3.0f))
+    camera(glm::vec3(0.0f, 3.0f, 0.0f))
 {
     resize(1280, 960);
     timer.start();
@@ -31,6 +32,21 @@ void Scene::initializeGL()
     glEnable(GL_DEPTH_TEST);
     shader.load();
     shader.use();
+
+
+    glGenVertexArrays(1, &VAO);
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ARRAY_BUFFER, mesh.size() * sizeof(float), mesh.data(), GL_STATIC_DRAW);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.constData(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 }
 
 void Scene::paintGL()
@@ -39,10 +55,18 @@ void Scene::paintGL()
     delta_time = current_frame - last_frame;
     last_frame = current_frame;
     processKey();
+    shader.setUniform("model", glm::mat4(1.0f));
     shader.setUniform("view", camera.lookAt());
-    glm::mat4 projection(1.0f);
-    projection = glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 100.0f);
-    shader.setUniform("projection", projection);
+    shader.setUniform("projection", glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 100.0f));
+
+    shader.setUniform("time", current_frame);
+    //shader.setUniform("time", 111.0f);
+    shader.setUniform("camera", camera.position());
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, mesh.size()/2);
+    //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
     update();
 }

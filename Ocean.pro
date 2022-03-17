@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     camera.cpp \
     main.cpp \
+    mesh.cpp \
     scene.cpp \
     shader.cpp
 
 HEADERS += \
     camera.h \
+    mesh.h \
     scene.h \
     shader.h
 
