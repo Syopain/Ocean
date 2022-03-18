@@ -34,8 +34,8 @@ private:
     QElapsedTimer timer;
     float delta_time = 0.0;
     float last_frame = 0.0;
-    Mesh mesh;
     std::bitset<64> key;
+    Mesh mesh;
     unsigned int VAO;
 };
 #endif // SCENE_H

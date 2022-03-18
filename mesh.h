@@ -8,17 +8,16 @@ public:
     Mesh();
     float const* data() const
     {
-        return vertices.constData();
+        return vertices_.constData();
     }
     int size() const
     {
-        return vertices.size();
+        return vertices_.size();
     }
 private:
     void generate(int inner, int outer, float layer);
 
-    QVector<float> vertices;
-    QVector<int> indices;
+    QVector<float> vertices_;
 };
 
 #endif // MESH_H

@@ -57,7 +57,7 @@ void Scene::paintGL()
     processKey();
     shader.setUniform("model", glm::mat4(1.0f));
     shader.setUniform("view", camera.lookAt());
-    shader.setUniform("projection", glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 100.0f));
+    shader.setUniform("projection", glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 800.0f));
 
     shader.setUniform("time", current_frame);
     //shader.setUniform("time", 111.0f);
@@ -66,14 +66,14 @@ void Scene::paintGL()
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, mesh.size()/2);
-    //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
     update();
 }
 
 void Scene::resizeGL(int width, int height)
 {
-
+    Q_UNUSED(width)
+    Q_UNUSED(height)
 }
 
 
@@ -104,7 +104,10 @@ void Scene::keyPressEvent(QKeyEvent* event)
             showFullScreen();
             break;
         case Qt::Key_Escape:
-            showNormal();
+            if (isFullScreen())
+                showNormal();
+            else
+                close();
             break;
     }
 
