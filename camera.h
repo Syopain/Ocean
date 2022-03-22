@@ -29,7 +29,7 @@ private:
     float pitch_ = 0.0f;
     float yaw_ = 0.0f;
     float fav_ = 45.0f;
-    float const speed_ = 2.5f;
+    float const speed_ = 5.0f;
 };
 
 inline void Camera::forward(float delta)

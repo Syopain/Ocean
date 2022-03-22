@@ -13,7 +13,7 @@
 Scene::Scene(QWidget *parent) :
     QOpenGLWidget(parent),
     shader("../shader.vert", "../shader.frag"),
-    camera(glm::vec3(0.0f, 3.0f, 0.0f))
+    camera(glm::vec3(0.0f, 5.0f, 0.0f))
 {
     resize(1280, 960);
     timer.start();
@@ -37,14 +37,10 @@ void Scene::initializeGL()
     glGenVertexArrays(1, &VAO);
     unsigned int VBO;
     glGenBuffers(1, &VBO);
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ARRAY_BUFFER, mesh.size() * sizeof(float), mesh.data(), GL_STATIC_DRAW);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.constData(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 }
@@ -63,7 +59,7 @@ void Scene::paintGL()
     //shader.setUniform("time", 111.0f);
     shader.setUniform("camera", camera.position());
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, mesh.size()/2);
 
