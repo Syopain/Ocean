@@ -28,24 +28,26 @@ void main()
 
     normal = vec3(0, 1, 0);
 
-    gerstnerWave(offset, 0.5f, 1.0f, 20, vec2(0.0f, 1.0f), 5);
-    gerstnerWave(offset, 0.5f, 1, 20, vec2(1.0f, 0.0f), 5);
-    gerstnerWave(offset, 0.5f, 1, l*2, vec2(0.5f, 0.5f), 5);
-    gerstnerWave(offset, 0.5f, 1, 30, vec2(1.0f, 0.2f), 5);
-    gerstnerWave(offset, 2.0f, 2, 200, vec2(1.0f, 1.5f), 3);
+    gerstnerWave(offset, 10.0f, 1, 200, vec2(1.0f, -1.0f), 3);
+
+    //gerstnerWave(offset, 2.f, 1.0f, 50, vec2(0.0f, -1.0f), 5);
+    //gerstnerWave(offset, 1.f, 1, 50, vec2(1.0f, 0.0f), 5);
+    //gerstnerWave(offset, 1.0f, 1, 40, vec2(0.5f, 0.5f), 5);
+    //gerstnerWave(offset, 1.0f, 1, 50, vec2(1.0f, 0.2f), 5);
+    //gerstnerWave(offset, 2.0f, 2, 200, vec2(1.0f, 1.5f), 3);
+    //gerstnerWave(offset, 2.0f, 2, 400, vec2(1.0f, 0.3f), 3);
 
     frag_pos = vec3(model * gl_Position);
     gl_Position = projection * view * model * gl_Position;
 
     normal = mat3(transpose(inverse(model))) * normal;
-    //if (normal.y < 0) normal = -normal;
     our_color = a_color;
     tex_coord = a_tex_coord;
 }
 
 void sinusoidsWave(vec2 p, float amplitude, float l, vec2 direction, float speed)
 {
-    gl_Position.y += amplitude * sin(dot(normalize(direction) * 2 * acos(-1) / l, p) + speed * time);
+    gerstnerWave(p, amplitude, 0, l, direction, speed);
 }
 
 void gerstnerWave(vec2 p, float amplitude, float q, float l, vec2 direction, float speed)
@@ -57,10 +59,21 @@ void gerstnerWave(vec2 p, float amplitude, float q, float l, vec2 direction, flo
     float s = sin(w * dot(direction, p) + speed * time);
 
     normal -= vec3(direction.x * w * amplitude * c,
-                  q * w * amplitude * s,
+                  q * s,
                   direction.y * w * amplitude * c);
 
+    gl_Position.xyz += vec3(q / w * direction.x * c,
+                amplitude * s,
+                q / w * direction.y * c);
+
+/*
+    q /= amplitude;
+    q /= w;
+    normal -= vec3(direction.x * w * amplitude * c,
+                  q * w * amplitude * s,
+                  direction.y * w * amplitude * c);
     gl_Position.xyz += vec3(q * amplitude * direction.x * c,
                 amplitude * s,
                 q * amplitude * direction.y * c);
+*/
 }
