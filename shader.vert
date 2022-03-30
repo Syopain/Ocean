@@ -28,14 +28,10 @@ void main()
 
     normal = vec3(0, 1, 0);
 
-    gerstnerWave(offset, 10.0f, 1, 200, vec2(1.0f, -1.0f), 3);
-
-    //gerstnerWave(offset, 2.f, 1.0f, 50, vec2(0.0f, -1.0f), 5);
-    //gerstnerWave(offset, 1.f, 1, 50, vec2(1.0f, 0.0f), 5);
-    //gerstnerWave(offset, 1.0f, 1, 40, vec2(0.5f, 0.5f), 5);
-    //gerstnerWave(offset, 1.0f, 1, 50, vec2(1.0f, 0.2f), 5);
-    //gerstnerWave(offset, 2.0f, 2, 200, vec2(1.0f, 1.5f), 3);
-    //gerstnerWave(offset, 2.0f, 2, 400, vec2(1.0f, 0.3f), 3);
+    gerstnerWave(offset, 3, 0.2f, 120, vec2(1.0, 1.0), 5);
+    gerstnerWave(offset, 2, 0.2f, 62, vec2(1.0, 0.6), 5);
+    gerstnerWave(offset, 1, 0.2f, 36, vec2(1.0, 1.3), 5);
+    gerstnerWave(offset, 2, 0.2f, 60, vec2(1.0, 0.0), 5);
 
     frag_pos = vec3(model * gl_Position);
     gl_Position = projection * view * model * gl_Position;

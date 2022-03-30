@@ -12,12 +12,14 @@ SOURCES += \
     camera.cpp \
     main.cpp \
     mesh.cpp \
+    painter.cpp \
     scene.cpp \
     shader.cpp
 
 HEADERS += \
     camera.h \
     mesh.h \
+    painter.h \
     scene.h \
     shader.h
 

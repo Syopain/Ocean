@@ -13,7 +13,7 @@
 Scene::Scene(QWidget *parent) :
     QOpenGLWidget(parent),
     shader("../shader.vert", "../shader.frag"),
-    camera(glm::vec3(0.0f, 5.0f, 0.0f))
+    camera(glm::vec3(0.0f, 10.0f, 0.0f))
 {
     resize(1280, 960);
     timer.start();
@@ -32,17 +32,6 @@ void Scene::initializeGL()
     glEnable(GL_DEPTH_TEST);
     shader.load();
     shader.use();
-
-
-    glGenVertexArrays(1, &VAO);
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, mesh.size() * sizeof(float), mesh.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
 }
 
 void Scene::paintGL()
@@ -54,16 +43,13 @@ void Scene::paintGL()
     shader.setUniform("model", glm::mat4(1.0f));
     shader.setUniform("view", camera.lookAt());
     shader.setUniform("projection", glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 800.0f));
-
     shader.setUniform("time", current_frame);
-    //shader.setUniform("time", 111.0f);
     shader.setUniform("camera", camera.position());
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, mesh.size()/2);
+    if(is_static) shader.setUniform("time", 0.0f);
 
-    update();
+    if(is_line) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void Scene::resizeGL(int width, int height)
@@ -75,8 +61,6 @@ void Scene::resizeGL(int width, int height)
 
 void Scene::keyPressEvent(QKeyEvent* event)
 {
-    //qDebug() << __func__ + QString("();");
-
     switch (event->key()) {
         case Qt::Key_W:
             if (!event->isAutoRepeat()) key['w'-'a'] = true;
@@ -95,6 +79,12 @@ void Scene::keyPressEvent(QKeyEvent* event)
             break;
         case Qt::Key_Control:
             if (!event->isAutoRepeat()) key[27] = true;
+            break;
+        case Qt::Key_C:
+            is_static = !is_static;
+            break;
+        case Qt::Key_L:
+            is_line = !is_line;
             break;
         case Qt::Key_Return:
             showFullScreen();

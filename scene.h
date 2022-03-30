@@ -16,6 +16,7 @@ class Scene : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 public:
     Scene(QWidget *parent = nullptr);
     ~Scene();
+
 protected:
     void initializeGL() override;
     void paintGL() override;
@@ -26,16 +27,17 @@ protected:
     void focusInEvent(QFocusEvent *event) override;
     void focusOutEvent(QFocusEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
-private:
-    void processKey();
 
     Shader shader;
+
+private:
+    void processKey();
     Camera camera;
     QElapsedTimer timer;
     float delta_time = 0.0;
     float last_frame = 0.0;
     std::bitset<64> key;
-    Mesh mesh;
-    unsigned int VAO;
+    bool is_static = false;
+    bool is_line = false;
 };
 #endif // SCENE_H

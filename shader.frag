@@ -25,13 +25,13 @@ void main()
     //material.ambient = vec3(0.19225, 0.19225, 0.19225);
     //material.diffuse = vec3(0.50754, 0.50754, 0.50754);
     //material.specular = vec3(0.508273, 0.508273, 0.508273);
-    material.ambient = 0.6 * vec3(0.05f, 0.3f, 0.42f);
+    material.ambient = vec3(0.05f, 0.3f, 0.42f);
     material.diffuse = vec3(0.05f, 0.3f, 0.42f);
     material.specular = vec3(1.0f, 1.0f, 1.0f);
     material.shininess = 10;
 
     vec3 light_color = vec3(1.0f, 1.0f, 1.0f);
-    vec3 light_dir = normalize(vec3(0.0f, 800.0f, 0.0f));
+    vec3 light_dir = normalize(vec3(0.0f, 800.0f, -1000.0f));
 
     vec3 ambient = light_color * material.ambient;
 
