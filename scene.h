@@ -39,5 +39,6 @@ private:
     std::bitset<64> key;
     bool is_static = false;
     bool is_line = false;
+    int FPS = 0;
 };
 #endif // SCENE_H

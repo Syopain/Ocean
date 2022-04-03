@@ -36,13 +36,18 @@ void Scene::initializeGL()
 
 void Scene::paintGL()
 {
+    FPS++;
     float current_frame = timer.elapsed() / 1000.f;
+    if (floor(current_frame) - floor(last_frame) == 1) {
+        qDebug("FPS:%d", FPS);
+        FPS = 0;
+    }
     delta_time = current_frame - last_frame;
     last_frame = current_frame;
     processKey();
     shader.setUniform("model", glm::mat4(1.0f));
     shader.setUniform("view", camera.lookAt());
-    shader.setUniform("projection", glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 800.0f));
+    shader.setUniform("projection", glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 3200.0f));
     shader.setUniform("time", current_frame);
     shader.setUniform("camera", camera.position());
 

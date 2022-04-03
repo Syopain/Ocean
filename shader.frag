@@ -1,15 +1,14 @@
 #version 330 core
 out vec4 frag_color;
 
-in vec3 our_color;
 in vec2 tex_coord;
-in vec3 normal;
 in vec3 frag_pos;
+in vec3 normal;
+in mat3 TBN;
 
-uniform sampler2D texture1;
-uniform sampler2D texture2;
-uniform float mix_value;
+uniform sampler2D texture;
 uniform vec3 camera;
+uniform float time;
 
 struct Material {
     vec3 ambient;
@@ -25,17 +24,29 @@ void main()
     //material.ambient = vec3(0.19225, 0.19225, 0.19225);
     //material.diffuse = vec3(0.50754, 0.50754, 0.50754);
     //material.specular = vec3(0.508273, 0.508273, 0.508273);
-    material.ambient = vec3(0.05f, 0.3f, 0.42f);
-    material.diffuse = vec3(0.05f, 0.3f, 0.42f);
-    material.specular = vec3(1.0f, 1.0f, 1.0f);
-    material.shininess = 10;
+    material.ambient = 0.7 * vec3(0.0f, 0.4f, 0.52f);
+    material.diffuse = 0.8 * vec3(0.0f, 0.4f, 0.52f);
+    material.specular = 1 * vec3(1.0f, 1.0f, 1.0f);
+    material.shininess = 8;
 
     vec3 light_color = vec3(1.0f, 1.0f, 1.0f);
+    //vec3 light_color = vec3(0.03f, 0.75f, 0.97f);
+
+    /*
+    light_color.r = (1-(1-cos(time))*0.03);
+    light_color.g = (1-(1-cos(time))*0.75);
+    light_color.b = (1-(1-cos(time))*0.97);
+    */
+
     vec3 light_dir = normalize(vec3(0.0f, 800.0f, -1000.0f));
 
     vec3 ambient = light_color * material.ambient;
 
-    vec3 norm = normalize(normal);
+    vec3 norm = texture(texture, tex_coord).rgb;
+    norm = normalize(norm * 2.0 - 1.0);
+    norm = normalize(TBN * norm);
+    //norm = normalize(normal);
+
     float diff = max(dot(norm, light_dir), 0.0);
     vec3 diffuse = light_color * (diff * material.diffuse);
 
@@ -48,7 +59,9 @@ void main()
 
     vec3 result = ambient + diffuse + specular;
 
-    frag_color = vec4(ambient + diffuse + specular, 0.5f);
+    frag_color = vec4((norm + 1)/2, 1);  // normal
+    frag_color = vec4(result, 0.5f);
+    //frag_color = texture(texture, tex_coord);
 }
 
 /*

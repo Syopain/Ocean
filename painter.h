@@ -14,6 +14,7 @@ protected:
     void paintGL() override;
 private:
     unsigned int VAO;
+    unsigned int texture;
     Mesh mesh;
 };
 

@@ -2,13 +2,13 @@
 
 Mesh::Mesh()
 {
-    generate(0, 20, 8);
-    generate(20, 50, 4);
-    generate(50, 100, 2);
-    generate(100, 200, 1);
-    generate(200, 400, 0.5);
-    generate(400, 800, 0.25);
-    generate(800, 1600, 0.125);
+    generate(0, 50, 8);
+    generate(50, 100, 4);
+    generate(100, 200, 2);
+    generate(200, 400, 1);
+    generate(400, 800, 0.5);
+    generate(800, 1600, 0.25);
+    generate(1600, 3800, 0.125); // l * 2/sqrt(3)
 }
 
 #if 1	// repair cracks
