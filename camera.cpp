@@ -12,7 +12,7 @@ void Camera::rotate(float pitch, float yaw)
 {
     pitch_ += pitch;
     yaw_ += yaw;
-    pitch_ = std::max(std::min(pitch_, 89.0f), -89.0f);
+    pitch_ = glm::clamp(pitch_, -89.0f, 89.0f);
 
     qDebug("pitch:%.2f, yaw:%.2f;", pitch_, yaw_);
 

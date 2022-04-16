@@ -1,11 +1,13 @@
 #version 330 core
 layout (location = 0) in vec2 a_pos;
-out vec2 tex_coord;
+out vec2 tex_coord_1;
+out vec2 tex_coord_2;
 out vec3 frag_pos;
 out vec3 tangent;
 out vec3 bitangent;
 out vec3 normal;
 out mat3 TBN;
+out float max_wave_height;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -13,19 +15,21 @@ uniform mat4 projection;
 
 uniform float time;
 uniform vec3 camera;
+uniform sampler2D texture;
 
 vec3 p1;
 vec3 p2;
 
-void sinusoidsWave(vec2 p, float amplitude, float w, vec2 direction, float speed);
-void gerstnerWave(vec2 p, float amplitude, float q, float w, vec2 direction, float speed);
+void sinusoidsWave(vec2 p, float amplitude, float w, vec2 direction, float speed, float offset);
+void gerstnerWave(vec2 p, float amplitude, float q, float w, vec2 direction, float speed, float offset);
 void tbn();
 
-float texture_size = 50;
+float texture_size = 80;
 float delta = 0.1;
 
 void main()
 {
+    max_wave_height = 0;
     vec2 offset = a_pos;
     offset.x += camera.x;
     offset.y += camera.z;
@@ -36,31 +40,45 @@ void main()
 
     normal = vec3(0, 1, 0);
 
-    float speed = 3;
-    gerstnerWave(offset, 1, 0.2f, 120, vec2(1.0, 1.0), speed);
-    gerstnerWave(offset, 1, 0.2f, 62, vec2(1.0, 0.6), speed);
-    gerstnerWave(offset, 1, 0.2f, 36, vec2(1.0, 1.3), speed);
-    gerstnerWave(offset, 1, 0.2f, 60, vec2(1.0, 0.0), speed);
+    float speed = 5;
 
-    tex_coord = gl_Position.xz / texture_size + time/5;
+    gerstnerWave(offset, 0.2, 0.2f, 25, vec2(1.0, 1.2), speed, 22.1);
+    gerstnerWave(offset, 0.2, 0.2f, 16, vec2(1.0, 0.6), speed, 11.4);
+    gerstnerWave(offset, 0.2, 0.2f, 15, vec2(1.0, 1.8), speed, 41.5);
+    gerstnerWave(offset, 0.2, 0.2f, 15, vec2(1.0, 0.0), speed, 10.2);
+
+    gerstnerWave(offset, 0.1, 0.1f, 37, vec2(-0.27, 0.68), speed, 3.2);
+    gerstnerWave(offset, 0.1, 0.1f, 25, vec2(0.16, -0.92), speed, 2.1);
+    gerstnerWave(offset, 0.1, 0.1f, 54, vec2(0.66, 0.39), speed, 5.4);
+    gerstnerWave(offset, 0.1, 0.1f, 56, vec2(-0.23, 0.67), speed, 12.0);
+    gerstnerWave(offset, 0.1, 0.1f, 39, vec2(0.35, 0.81), speed, 41.4);
+    gerstnerWave(offset, 0.1, 0.1f, 39, vec2(-0.44, 0.86), speed, 39.1);
+    gerstnerWave(offset, 0.1, 0.1f, 51, vec2(0.31, -0.44), speed, 39.4);
+    gerstnerWave(offset, 0.1, 0.1f, 12, vec2(0.37, 0.47), speed, 14.1);
+    gerstnerWave(offset, 0.1, 0.1f, 17, vec2(-0.88, 0.22), speed, 24.5);
+
+    float f = time / 20;
+    tex_coord_1 = gl_Position.xz / texture_size + vec2(f, 0.0);
+    tex_coord_2 = gl_Position.xz / texture_size + vec2(0.0, f);
 
     tbn();
     frag_pos = vec3(model * gl_Position);
     gl_Position = projection * view * model * gl_Position;
 }
 
-void sinusoidsWave(vec2 p, float amplitude, float l, vec2 direction, float speed)
+void sinusoidsWave(vec2 p, float amplitude, float l, vec2 direction, float speed, float offset)
 {
-    gerstnerWave(p, amplitude, 0, l, direction, speed);
+    gerstnerWave(p, amplitude, 0, l, direction, speed, offset);
 }
 
-void gerstnerWave(vec2 p, float amplitude, float q, float l, vec2 direction, float speed)
+void gerstnerWave(vec2 p, float amplitude, float q, float l, vec2 direction, float speed, float offset)
 {
+    max_wave_height += amplitude;
     direction = normalize(direction);
 
     float w = 2 * acos(-1) / l;
-    float c = cos(w * dot(direction, p) + speed * time);
-    float s = sin(w * dot(direction, p) + speed * time);
+    float c = cos(w * dot(direction, p) + speed * time + offset);
+    float s = sin(w * dot(direction, p) + speed * time + offset);
 
     normal -= vec3(direction.x * w * amplitude * c,
                   q * s,
@@ -71,14 +89,14 @@ void gerstnerWave(vec2 p, float amplitude, float q, float l, vec2 direction, flo
                 q / w * direction.y * c);
 
 
-    float c1 = cos(w * dot(direction, p + vec2(delta, 0.0)) + speed * time);
-    float s1 = sin(w * dot(direction, p + vec2(delta, 0.0)) + speed * time);
+    float c1 = cos(w * dot(direction, p + vec2(delta, 0.0)) + speed * time + offset);
+    float s1 = sin(w * dot(direction, p + vec2(delta, 0.0)) + speed * time + offset);
     p1 += vec3(q / w * direction.x * c1,
                 amplitude * s1,
                 q / w * direction.y * c1);
 
-    float c2 = cos(w * dot(direction, p + vec2(0.0, delta)) + speed * time);
-    float s2 = sin(w * dot(direction, p + vec2(0.0, delta)) + speed * time);
+    float c2 = cos(w * dot(direction, p + vec2(0.0, delta)) + speed * time + offset);
+    float s2 = sin(w * dot(direction, p + vec2(0.0, delta)) + speed * time + offset);
     p2 += vec3(q / w * direction.x * c2,
                 amplitude * s2,
                 q / w * direction.y * c2);

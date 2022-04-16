@@ -85,7 +85,7 @@ inline glm::mat4 Camera::lookAt()
 inline float Camera::zoom(int angle)
 {
     fav_ -= angle * 0.05f;  //sensitivity
-    fav_ = std::max(std::min(fav_, 45.0f), 5.0f);
+    fav_ = glm::clamp(fav_, 5.0f, 45.0f);
     return glm::radians(fav_);
 }
 

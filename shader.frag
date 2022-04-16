@@ -1,67 +1,84 @@
 #version 330 core
 out vec4 frag_color;
 
-in vec2 tex_coord;
+in vec2 tex_coord_1;
+in vec2 tex_coord_2;
 in vec3 frag_pos;
 in vec3 normal;
 in mat3 TBN;
+in float max_wave_height;
 
 uniform sampler2D texture;
 uniform vec3 camera;
 uniform float time;
+uniform vec3 color;
 
 struct Material {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    vec3 subsurface;
     float shininess;
 };
 
 Material material;
 
+struct Light {
+    vec3 color;
+    vec3 dir;
+};
+
+
+float BSSRDF(vec3 lightDir, vec3 viewDir, vec3 normal, float distortion, float waveHeight, float SSSMask)
+{
+    vec3 h = normalize(lightDir + normal * distortion);
+    return pow((dot(viewDir, -h) + 1) / 2, 1.0) * waveHeight * SSSMask;
+}
+
 void main()
 {
-    //material.ambient = vec3(0.19225, 0.19225, 0.19225);
-    //material.diffuse = vec3(0.50754, 0.50754, 0.50754);
-    //material.specular = vec3(0.508273, 0.508273, 0.508273);
-    material.ambient = 0.7 * vec3(0.0f, 0.4f, 0.52f);
-    material.diffuse = 0.8 * vec3(0.0f, 0.4f, 0.52f);
+    material.ambient = 1.0 * color;
+    material.diffuse = 0.5 * color;
+    material.subsurface = 1.0 * color;
     material.specular = 1 * vec3(1.0f, 1.0f, 1.0f);
-    material.shininess = 8;
+    material.shininess = 16;
 
-    vec3 light_color = vec3(1.0f, 1.0f, 1.0f);
-    //vec3 light_color = vec3(0.03f, 0.75f, 0.97f);
+    //vec3 light_color = vec3(1.0f, 1.0f, 1.0f);
+    //vec3 light_dir = normalize(vec3(0.0f, 400.0f, -800.0f));
 
-    /*
-    light_color.r = (1-(1-cos(time))*0.03);
-    light_color.g = (1-(1-cos(time))*0.75);
-    light_color.b = (1-(1-cos(time))*0.97);
-    */
+    Light light[2];
+    light[0].color = vec3(1.0f, 1.0f, 1.0f);
+    light[0].dir = normalize(vec3(0.0f, 100.0f, -200.0f));
 
-    vec3 light_dir = normalize(vec3(0.0f, 800.0f, -1000.0f));
+    vec3 bump = mix(texture(texture, tex_coord_1), texture(texture, tex_coord_2), 0.5).rgb;
+    bump = normalize(bump * 2.0 - 1.0);
+    bump = normalize(TBN * bump);
+    vec3 norm = normalize(normal);
 
-    vec3 ambient = light_color * material.ambient;
+    float PI = acos(-1);
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    vec3 subsurface;
 
-    vec3 norm = texture(texture, tex_coord).rgb;
-    norm = normalize(norm * 2.0 - 1.0);
-    norm = normalize(TBN * norm);
-    //norm = normalize(normal);
+    for (int i = 0; i < 1; ++i) {
+        ambient = light[i].color * material.ambient;;
 
-    float diff = max(dot(norm, light_dir), 0.0);
-    vec3 diffuse = light_color * (diff * material.diffuse);
+        float diff = max(dot(normalize(1*norm + bump), light[i].dir), 0.0);
+        diffuse += light[i].color * (diff * material.diffuse);
 
-    vec3 view_dir = normalize(camera - frag_pos);
-    vec3 haflway_dir = normalize(light_dir + view_dir);
-    vec3 reflect_dir = reflect(-light_dir, norm);
-    float spec = pow(max(dot(haflway_dir, norm), 0.0f), material.shininess * 128);
-    //spec = pow(max(dot(reflect_dir, view_dir), 0.0f), material.shininess * 128);
-    vec3 specular = light_color * (spec * material.specular);
+        vec3 view_dir = normalize(camera - frag_pos);
+        vec3 haflway_dir = normalize(light[i].dir + view_dir);
+        float spec = pow(max(dot(haflway_dir, bump), 0.0f), material.shininess * 128);
+        specular += light[i].color * (spec * material.specular);
 
-    vec3 result = ambient + diffuse + specular;
+        subsurface += BSSRDF(light[i].dir, view_dir, bump, 0.5, (frag_pos.y + max_wave_height) / (max_wave_height * 2), 1) * material.subsurface;
+    }
+
+    vec3 result = ambient + diffuse + specular + subsurface;
 
     frag_color = vec4((norm + 1)/2, 1);  // normal
     frag_color = vec4(result, 0.5f);
-    //frag_color = texture(texture, tex_coord);
 }
 
 /*

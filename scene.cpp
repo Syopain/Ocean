@@ -66,25 +66,8 @@ void Scene::resizeGL(int width, int height)
 
 void Scene::keyPressEvent(QKeyEvent* event)
 {
+    if (!event->isAutoRepeat()) key[event->key()] = true;
     switch (event->key()) {
-        case Qt::Key_W:
-            if (!event->isAutoRepeat()) key['w'-'a'] = true;
-            break;
-        case Qt::Key_S:
-            if (!event->isAutoRepeat()) key['s'-'a'] = true;
-            break;
-        case Qt::Key_A:
-            if (!event->isAutoRepeat()) key['a'-'a'] = true;
-            break;
-        case Qt::Key_D:
-            if (!event->isAutoRepeat()) key['d'-'a'] = true;
-            break;
-        case Qt::Key_Space:
-            if (!event->isAutoRepeat()) key[26] = true;
-            break;
-        case Qt::Key_Control:
-            if (!event->isAutoRepeat()) key[27] = true;
-            break;
         case Qt::Key_C:
             is_static = !is_static;
             break;
@@ -107,36 +90,19 @@ void Scene::keyPressEvent(QKeyEvent* event)
 
 void Scene::keyReleaseEvent(QKeyEvent* event)
 {
-    switch (event->key()) {
-        case Qt::Key_W:
-            if (!event->isAutoRepeat()) key['w'-'a'] = false;
-            break;
-        case Qt::Key_S:
-            if (!event->isAutoRepeat()) key['s'-'a'] = false;
-            break;
-        case Qt::Key_A:
-            if (!event->isAutoRepeat()) key['a'-'a'] = false;
-            break;
-        case Qt::Key_D:
-            if (!event->isAutoRepeat()) key['d'-'a'] = false;
-            break;
-        case Qt::Key_Space:
-            if (!event->isAutoRepeat()) key[26] = false;
-            break;
-        case Qt::Key_Control:
-            if (!event->isAutoRepeat()) key[27] = false;
-            break;
-    }
+    if (!event->isAutoRepeat()) key[event->key()] = false;
+
+    QOpenGLWidget::keyReleaseEvent(event);
 }
 
 void Scene::processKey()
 {
-    if (key['w'-'a']) camera.forward(delta_time);	// Key_W
-    if (key['s'-'a']) camera.backward(delta_time);	// Key_S
-    if (key['a'-'a']) camera.left(delta_time);		// Key_A
-    if (key['d'-'a']) camera.right(delta_time);		// Key_D
-    if (key[26]) camera.rise(delta_time);			// Key_Space
-    if (key[27]) camera.drop(delta_time);			// Key_Control
+    if (key[Qt::Key_W]) camera.forward(delta_time);
+    if (key[Qt::Key_S]) camera.backward(delta_time);
+    if (key[Qt::Key_A]) camera.left(delta_time);
+    if (key[Qt::Key_D]) camera.right(delta_time);
+    if (key[Qt::Key_Space]) camera.rise(delta_time);
+    if (key[Qt::Key_Control]) camera.drop(delta_time);
 }
 
 void Scene::mouseMoveEvent(QMouseEvent* event)

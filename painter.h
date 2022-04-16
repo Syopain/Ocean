@@ -12,10 +12,13 @@ public:
 protected:
     void initializeGL() override;
     void paintGL() override;
+
+    void processKey() override;
 private:
     unsigned int VAO;
     unsigned int texture;
     Mesh mesh;
+    glm::vec3 color;
 };
 
 #endif // PAINTER_H
