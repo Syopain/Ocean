@@ -4,6 +4,7 @@ out vec4 frag_color;
 in vec2 tex_coord_1;
 in vec2 tex_coord_2;
 in vec3 frag_pos;
+in vec3 screen_pos;
 in vec3 normal;
 in mat3 TBN;
 in float max_wave_height;
@@ -29,19 +30,30 @@ struct Light {
 };
 
 
-float BSSRDF(vec3 lightDir, vec3 viewDir, vec3 normal, float distortion, float waveHeight, float SSSMask)
+float sss_intensity(vec3 lightDir, vec3 viewDir, vec3 normal, float distortion, float waveHeight, float SSSMask)
 {
     vec3 h = normalize(lightDir + normal * distortion);
-    return pow((dot(viewDir, -h) + 1) / 2, 1.0) * waveHeight * SSSMask;
+    return pow((dot(viewDir, -h) + 1) / 2, 4.0) * waveHeight * SSSMask;
+    //return pow(clamp(dot(viewDir, -h), 0, 1), 1) * waveHeight * SSSMask;
+}
+
+float fresnel_intensity(vec3 v, vec3 norm)
+{
+    float _AirRefractiveIndex = 1.0f;
+    float _WaterRefractiveIndex = 1.33f;
+
+    float R_0 = (_AirRefractiveIndex - _WaterRefractiveIndex) / (_AirRefractiveIndex + _WaterRefractiveIndex);
+    R_0 *= R_0;
+    return  R_0 + (1.0 - R_0) * pow((1.0 - clamp(dot(v, norm), 0, 16)), 4);
 }
 
 void main()
 {
-    material.ambient = 1.0 * color;
-    material.diffuse = 0.5 * color;
-    material.subsurface = 1.0 * color;
-    material.specular = 1 * vec3(1.0f, 1.0f, 1.0f);
-    material.shininess = 16;
+    material.ambient = 0.2 * color;
+    material.diffuse = 1.0 * color;
+    material.subsurface = 1.0 * vec3(0.3f, 0.9f, 1.0f);
+    material.specular = vec3(1.0f, 1.0f, 1.0f);
+    material.shininess = 8;
 
     //vec3 light_color = vec3(1.0f, 1.0f, 1.0f);
     //vec3 light_dir = normalize(vec3(0.0f, 400.0f, -800.0f));
@@ -60,11 +72,12 @@ void main()
     vec3 diffuse;
     vec3 specular;
     vec3 subsurface;
+    vec3 fresnel;
 
     for (int i = 0; i < 1; ++i) {
-        ambient = light[i].color * material.ambient;;
+        ambient = light[i].color * material.ambient * (frag_pos.y + max_wave_height) / (max_wave_height * 2);
 
-        float diff = max(dot(normalize(1*norm + bump), light[i].dir), 0.0);
+        float diff = max(dot(normalize(1 * norm + bump * 0), light[i].dir), 0.0);
         diffuse += light[i].color * (diff * material.diffuse);
 
         vec3 view_dir = normalize(camera - frag_pos);
@@ -72,10 +85,14 @@ void main()
         float spec = pow(max(dot(haflway_dir, bump), 0.0f), material.shininess * 128);
         specular += light[i].color * (spec * material.specular);
 
-        subsurface += BSSRDF(light[i].dir, view_dir, bump, 0.5, (frag_pos.y + max_wave_height) / (max_wave_height * 2), 1) * material.subsurface;
+        if (true || i == 0) // Removing this causes bugs, which I don't understand why
+        subsurface += sss_intensity(light[i].dir, view_dir, bump, 1.0, (frag_pos.y + max_wave_height) / (max_wave_height * 2), 1) * material.subsurface;
+
+        fresnel += fresnel_intensity(view_dir, bump) * vec3(0.5f, 0.8f, 0.9) * 0.05;
     }
 
-    vec3 result = ambient + diffuse + specular + subsurface;
+
+    vec3 result = ambient + diffuse + specular + subsurface + fresnel;
 
     frag_color = vec4((norm + 1)/2, 1);  // normal
     frag_color = vec4(result, 0.5f);

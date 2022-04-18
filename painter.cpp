@@ -3,7 +3,7 @@
 
 Painter::Painter(QWidget* parent) :
     Scene(parent),
-    color(0.10f, 0.40f, 0.50f)
+    color(0.0f, 0.6f, 0.7f)
 {
 
 }

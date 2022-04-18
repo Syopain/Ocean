@@ -3,6 +3,7 @@ layout (location = 0) in vec2 a_pos;
 out vec2 tex_coord_1;
 out vec2 tex_coord_2;
 out vec3 frag_pos;
+out vec3 screen_pos;
 out vec3 tangent;
 out vec3 bitangent;
 out vec3 normal;
@@ -24,7 +25,7 @@ void sinusoidsWave(vec2 p, float amplitude, float w, vec2 direction, float speed
 void gerstnerWave(vec2 p, float amplitude, float q, float w, vec2 direction, float speed, float offset);
 void tbn();
 
-float texture_size = 80;
+float texture_size = 200;
 float delta = 0.1;
 
 void main()
@@ -42,10 +43,10 @@ void main()
 
     float speed = 5;
 
-    gerstnerWave(offset, 0.2, 0.2f, 25, vec2(1.0, 1.2), speed, 22.1);
-    gerstnerWave(offset, 0.2, 0.2f, 16, vec2(1.0, 0.6), speed, 11.4);
-    gerstnerWave(offset, 0.2, 0.2f, 15, vec2(1.0, 1.8), speed, 41.5);
-    gerstnerWave(offset, 0.2, 0.2f, 15, vec2(1.0, 0.0), speed, 10.2);
+    gerstnerWave(offset, 0.4, 0.1f, 50, vec2(1.0, 1.2), speed, 22.1);
+    gerstnerWave(offset, 0.3, 0.1f, 32, vec2(1.0, 0.6), speed, 11.4);
+    gerstnerWave(offset, 0.2, 0.1f, 30, vec2(1.0, 1.8), speed, 41.5);
+    //gerstnerWave(offset, 0.2, 0.1f, 30, vec2(1.0, 0.0), speed, 10.2);
 
     gerstnerWave(offset, 0.1, 0.1f, 37, vec2(-0.27, 0.68), speed, 3.2);
     gerstnerWave(offset, 0.1, 0.1f, 25, vec2(0.16, -0.92), speed, 2.1);
@@ -64,6 +65,7 @@ void main()
     tbn();
     frag_pos = vec3(model * gl_Position);
     gl_Position = projection * view * model * gl_Position;
+    screen_pos = gl_Position.xyz;
 }
 
 void sinusoidsWave(vec2 p, float amplitude, float l, vec2 direction, float speed, float offset)
