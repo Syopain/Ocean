@@ -3,7 +3,7 @@
 
 Painter::Painter(QWidget* parent) :
     Scene(parent),
-    color(0.0f, 0.6f, 0.7f)
+    color(0.1f, 0.5f, 0.7f)
 {
 
 }
@@ -12,15 +12,23 @@ void Painter::initializeGL()
 {
     Scene::initializeGL();
 
-    glGenTextures(1, &texture);
+    glGenTextures(2, texture);
 
     QImage bump = QGLWidget::convertToGLFormat(QImage("../texture/bump.jfif").mirrored());
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bump.width(), bump.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bump.bits());
+    glGenerateMipmap(GL_TEXTURE_2D);
+    QImage diffuse = QGLWidget::convertToGLFormat(QImage("../texture/Ocean_Foam-3_diffuseOriginal.png").mirrored());
+    glBindTexture(GL_TEXTURE_2D, texture[1]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuse.width(), diffuse.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuse.bits());
     glGenerateMipmap(GL_TEXTURE_2D);
 
     glGenVertexArrays(1, &VAO);
@@ -44,7 +52,9 @@ void Painter::paintGL()
     shader.setUniform("color", color);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture[1]);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, mesh.size()/2);

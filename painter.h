@@ -16,7 +16,7 @@ protected:
     void processKey() override;
 private:
     unsigned int VAO;
-    unsigned int texture;
+    unsigned int texture[10];
     Mesh mesh;
     glm::vec3 color;
 };
