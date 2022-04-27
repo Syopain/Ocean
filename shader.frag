@@ -59,7 +59,7 @@ float fresnel_intensity(vec3 v, vec3 norm)
 
     float r = (airRefractiveIndex - waterRefractiveIndex) / (airRefractiveIndex + waterRefractiveIndex);
     r *= r;
-    return  r + (0.8 - r) * pow((1.0 - clamp(abs(dot(v, norm)), 0, 1)), 8);
+    return  r + (0.8 - r) * pow((1.0 - clamp(abs(dot(v, norm)), 0, 1)), 4);
 }
 
 void main()
@@ -68,10 +68,11 @@ void main()
     //material.diffuse = 1 * texture(texture2, tex_coord).rgb;
     material.diffuse = 0.5 * color;
     //material.subsurface = 1 * vec3(0.3f, 1.0f, 0.9f);
-    material.subsurface = 1.2 * (color + vec3(0.1, 0.5, 0.3));
+    material.subsurface = 1.6 * (color + vec3(0.1, 0.5, 0.3));
     material.specular = vec3(1.0f, 1.0f, 1.0f);
-    material.fresnel =  0.3 * vec3(0.5, 0.8f, 0.9f);
-    material.shininess = 8;
+    //material.fresnel =  0.5 * vec3(0.5, 0.8f, 0.9f);
+    material.fresnel =  0.5 * vec3(1.0, 1.0, 1.0);
+    material.shininess = 12;
 
     vec3 light_color = vec3(1.0f, 1.0f, 1.0f);
     vec3 light_dir = normalize(vec3(0.0f, 400.0f, -800.0f));
