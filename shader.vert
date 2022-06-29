@@ -46,16 +46,19 @@ void main()
     normal = vec3(0, 1, 0);
 
     float speed = 5;
-    syoGerstnerWave(offset, 2.0, 0.20f, 60, vec2(1.0, 1.2), speed, 22.1, 253);
-    syoGerstnerWave(offset, 1.0, 0.20f, 32, vec2(1.0, 0.6), speed, 11.4, 124);
-    syoGerstnerWave(offset, 1.0, 0.20f, 30, vec2(1.0, 1.8), speed, 41.5, 32);
-    syoGerstnerWave(offset, 1.0, 0.20f, 36, vec2(1.0, 0.0), speed, 10.2, 42);
     /*
     gerstnerWave(offset, 0.5, 0.20f, 60, vec2(1.0, 1.2), speed, 22.1);
     gerstnerWave(offset, 0.5, 0.20f, 32, vec2(1.0, 0.6), speed, 11.4);
     gerstnerWave(offset, 0.5, 0.20f, 30, vec2(1.0, 1.8), speed, 41.5);
     gerstnerWave(offset, 0.5, 0.20f, 30, vec2(1.0, 0.0), speed, 10.2);
     */
+
+
+    syoGerstnerWave(offset, 3, 0.20f, 60, vec2(1.0, 1.2), speed, 22.1, 253);
+    syoGerstnerWave(offset, 1, 0.20f, 32, vec2(1.0, 0.6), speed, 11.4, 124);
+    syoGerstnerWave(offset, 2, 0.20f, 30, vec2(1.0, 1.8), speed, 41.5, 72);
+    syoGerstnerWave(offset, 1, 0.20f, 36, vec2(1.0, 0.0), speed, 10.2, 152);
+
     gerstnerWave(offset, 0.1, 0.0f, 37, vec2(-0.27, 0.68), speed, 3.2);
     gerstnerWave(offset, 0.1, 0.0f, 25, vec2(0.16, -0.92), speed, 2.1);
     gerstnerWave(offset, 0.1, 0.0f, 54, vec2(0.66, 0.39), speed, 5.4);
@@ -88,7 +91,7 @@ void gerstnerWave(vec2 p, float amplitude, float q, float l, vec2 direction, flo
     direction = normalize(direction);
     amplitude *= distance;
 
-    float w = 2 * acos(-1) / l;
+    float w = 2 * acos(-1.0) / l;
     float c = cos(w * dot(direction, p) + speed * time + offset);
     float s = sin(w * dot(direction, p) + speed * time + offset);
 
@@ -131,11 +134,11 @@ void syoGerstnerWave(vec2 p, float amplitude, float q, float l, vec2 direction, 
     direction = normalize(direction);
     amplitude *= distance;
 
-    float lw = 2 * acos(-1) / lifetime;
+    float lw = 2 * acos(-1.0) / lifetime;
     float lc = (cos(lw * dot(direction, p) + 0 * time + offset) + 1) * 0.5;
 
 
-    float w = 2 * acos(-1) / l;
+    float w = 2 * acos(-1.0) / l;
     float c = cos(w * dot(direction, p) + speed * time + offset);
     float s = sin(w * dot(direction, p) + speed * time + offset);
 

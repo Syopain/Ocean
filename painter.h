@@ -19,6 +19,7 @@ private:
     unsigned int texture[10];
     Mesh mesh;
     glm::vec3 color;
+    int status = 1;
 };
 
 #endif // PAINTER_H

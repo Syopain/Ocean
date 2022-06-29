@@ -15,6 +15,7 @@ uniform sampler2D texture2;
 uniform vec3 camera;
 uniform float time;
 uniform vec3 color;
+uniform int status;
 
 struct Material {
     vec3 ambient;
@@ -35,19 +36,24 @@ struct Light {
 
 float sss_intensity(vec3 lightDir, vec3 viewDir, vec3 normal, float distortion, float waveHeight, float SSSMask)
 {
+    if (status == 0) return 0;
     vec3 h = normalize(viewDir + normal * distortion);
-    float I = pow(clamp(dot(h, -lightDir), 0, 1), 4.0) * pow(waveHeight, 1.2) * SSSMask;
+    float I = pow(clamp(dot(h, -lightDir), 0, 1), 4.0) * pow(waveHeight, 1) * SSSMask;
 
     // Fast Subsurface Scattering
-    /*if (screen_pos.x < 0) {
+    if (status == 2) {
+    //if (screen_pos.x > 0) {
         h = normalize(lightDir + normal * distortion);
-        I = pow(clamp(dot(viewDir, -h), 0, 1), 4.0) * waveHeight * SSSMask;
-    }*/
+        I = pow(clamp(dot(viewDir, -h), 0, 1), 4.0) * pow(waveHeight, 1) * SSSMask;
+        return I;
+    }
 
+/*
     vec3 ambientDir = -viewDir;
     ambientDir.y = dot(viewDir, normalize(vec3(viewDir.x, 0, viewDir.z)));
     ambientDir = normalize(ambientDir);
     I += pow(clamp(dot(h, -ambientDir), 0, 1), 4.0) * waveHeight * SSSMask * 0.2;
+*/
     return I;
 
 }
@@ -57,16 +63,16 @@ float fresnel_intensity(vec3 v, vec3 norm)
     float airRefractiveIndex = 1.0f;
     float waterRefractiveIndex = 1.33f;
 
-    float r = (airRefractiveIndex - waterRefractiveIndex) / (airRefractiveIndex + waterRefractiveIndex);
-    r *= r;
-    return  r + (0.8 - r) * pow((1.0 - clamp(abs(dot(v, norm)), 0, 1)), 4);
+    float F0 = (airRefractiveIndex - waterRefractiveIndex) / (airRefractiveIndex + waterRefractiveIndex);
+    F0 *= F0;
+    return  F0 + (1 - F0) * pow((1.0 - clamp(abs(dot(v, norm)), 0, 1)), 5);
 }
 
 void main()
 {
     material.ambient = 0.5 * color;
     //material.diffuse = 1 * texture(texture2, tex_coord).rgb;
-    material.diffuse = 0.5 * color;
+    material.diffuse = 0.2 * color;
     //material.subsurface = 1 * vec3(0.3f, 1.0f, 0.9f);
     material.subsurface = 1.6 * (color + vec3(0.1, 0.5, 0.3));
     material.specular = vec3(1.0f, 1.0f, 1.0f);
@@ -82,33 +88,30 @@ void main()
     bump = normalize(TBN * bump);
     vec3 norm = normalize(normal);
 
-    float PI = acos(-1);
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    vec3 subsurface;
-    vec3 fresnel;
+    vec3 ambient = light_color * material.ambient;// * (frag_pos.y + max_wave_height) / (max_wave_height * 2);
 
-    ambient = light_color * material.ambient;// * (frag_pos.y + max_wave_height) / (max_wave_height * 2);
-
-    float diff = max(dot(normalize(norm), light_dir), 0.0);
-    diffuse = light_color * (diff * material.diffuse);
+    float diff = max(dot(normalize(0.2*bump + norm), light_dir), 0.0);
+    vec3 diffuse = light_color * (diff * material.diffuse);
 
     vec3 view_dir = normalize(camera - frag_pos);
     vec3 haflway_dir = normalize(light_dir + view_dir);
     float spec = pow(max(dot(haflway_dir, bump), 0.0f), material.shininess * 128);
-    specular = light_color * (spec * material.specular);
+    vec3 specular = light_color * (spec * material.specular);
 
     bump = normalize(bump + norm);
     float fresl = fresnel_intensity(view_dir, bump);
 
-    subsurface = (1-fresl) * sss_intensity(light_dir, view_dir, bump, 0.12, (frag_pos.y + max_wave_height) / (max_wave_height * 2), 1) * material.subsurface;
+    float sss = (1-fresl) * sss_intensity(light_dir, view_dir, bump, 0.5, (frag_pos.y + max_wave_height) / (max_wave_height * 2), 1);
+    vec3 subsurface = sss * material.subsurface;
 
-    fresnel = fresl * material.fresnel;
+    vec3 fresnel = fresl * material.fresnel;
 
     vec3 result = ambient + diffuse + specular + subsurface + fresnel;
+    //vec3 result = ambient + diffuse + specular + fresnel;// + subsurface;
+    //if (screen_pos.x > 0) result += subsurface;
 
-    frag_color = vec4(result, 0.5f);
+    frag_color = vec4(result, 1.0f);
+    //frag_color = vec4(color, 1);
 }
 
 /*

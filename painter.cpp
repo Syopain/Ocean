@@ -37,6 +37,7 @@ void Painter::initializeGL()
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    qDebug("size:%d", mesh.size());
     glBufferData(GL_ARRAY_BUFFER, mesh.size() * sizeof(float), mesh.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -50,6 +51,7 @@ void Painter::paintGL()
     Scene::paintGL();
 
     shader.setUniform("color", color);
+    shader.setUniform("status", status);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -65,7 +67,16 @@ void Painter::paintGL()
 void Painter::processKey()
 {
     float delta = 0.005;
-    if(key[Qt::Key_Up]) {
+
+    if (key[Qt::Key_0]) status = 0;
+    if (key[Qt::Key_1]) status = 1;
+    if (key[Qt::Key_2]) status = 2;
+    if (key[Qt::Key_0] || key[Qt::Key_1] || key[Qt::Key_2]) {
+        qDebug("status: %d", status);
+    }
+
+    status = glm::clamp(status, 0, 2);
+    if (key[Qt::Key_Up]) {
         if (key[Qt::Key_R]) color.r += delta;
         if (key[Qt::Key_G]) color.g += delta;
         if (key[Qt::Key_B]) color.b += delta;

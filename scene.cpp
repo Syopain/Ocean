@@ -44,14 +44,17 @@ void Scene::paintGL()
     }
     delta_time = current_frame - last_frame;
     last_frame = current_frame;
+
+    static float static_frame = current_frame;
+    if (!is_static) static_frame = current_frame;
     processKey();
     shader.setUniform("model", glm::mat4(1.0f));
     shader.setUniform("view", camera.lookAt());
     shader.setUniform("projection", glm::perspective(camera.zoom(0), static_cast<float>(width()) / height(), 0.1f, 3200.0f));
-    shader.setUniform("time", current_frame);
+    shader.setUniform("time", static_frame);
     shader.setUniform("camera", camera.position());
 
-    if(is_static) shader.setUniform("time", 0.0f);
+    //if(is_static) shader.setUniform("time", last_frame);
 
     if(is_line) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

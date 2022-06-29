@@ -5,8 +5,7 @@
 #include <algorithm>
 #include <QDebug>
 
-class Camera
-{
+class Camera {
 public:
     Camera(glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
            glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f),
