@@ -76,8 +76,9 @@ void main()
 
     tbn();
     frag_pos = vec3(model * gl_Position);
+    //gl_Position = projection * view * model * gl_Position;
     gl_Position = projection * view * model * gl_Position;
-    screen_pos = gl_Position.xyz;
+    screen_pos = gl_Position.xyz / gl_Position.w;
 }
 
 void sinusoidsWave(vec2 p, float amplitude, float l, vec2 direction, float speed, float offset)
